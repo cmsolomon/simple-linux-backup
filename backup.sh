@@ -74,7 +74,7 @@ fi
 # Now finally run the backup into the WIP directory
 echo Running backup...
 
-rsync -hua --no-inc-recursive --delete --force --info=progress2 $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS
+rsync -hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS
 # Flags:
 # h - human readable sizes (KB, MG, GB), rather than everything in bytes.
 # u - update
@@ -90,6 +90,7 @@ rsync -hua --no-inc-recursive --delete --force --info=progress2 $FOLDER_TO_BACKU
 # --delete - delete files that are missing from the destination on update
 # --force  - delete non-empty directories, if they are missing from destination on update
 # --info=progress2 - display the new overall progress indicator
+# --ignore-missing-args - temp files may disappear after the changeset is canceled but before the copy, giving a 'vanished' file error - this ignores vanished files.
 
 # Finally rename the WIP folder to using the epoch timestamp
 readonly newBackupName="$BACKUP_PREFIX""$(date +%s)"
