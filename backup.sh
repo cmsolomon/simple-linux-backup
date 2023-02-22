@@ -104,4 +104,7 @@ readonly newBackupName="$BACKUP_PREFIX""$(date +%s)"
 echo Renaming "$BACKUP_IN_PROGRESS" to "$newBackupName"...
 mv "$BACKUP_IN_PROGRESS" "$newBackupName"
 
+# Ensure the modification time is updated to match the timestamp in the name (for easy human reading)
+touch "$newBackupName"
+
 echo Backup complete.
