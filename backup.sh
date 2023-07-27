@@ -15,9 +15,16 @@ set -e # Exit on first error
 # Configuration Section
 readonly MAX_BACKUPS=3
 readonly BACKUP_PREFIX="backup/"$USER"/"
+readonly COMPRESS_DATA_DURING_TRANSFER="false"
 
 readonly FOLDER_TO_BACKUP=$HOME
-readonly COMPRESS_DATA_DURING_TRANSFER="false"
+
+# Add patterns for files or folders to exclude to this list, e.g.
+# readonly EXCLUSION_LIST=(
+#     "$FOLDER_TO_BACKUP/folder_to_exclude/"
+#     "$FOLDER_TO_BACKUP/file_to_exclude"
+#)
+readonly EXCLUSION_LIST=()
 
 # Constants - change them and it's your responsibility to ensure nothing breaks :) 
 readonly BACKUP_IN_PROGRESS="$BACKUP_PREFIX""WIP"
@@ -73,18 +80,9 @@ if [ "$backupInProgress" == "false" ]; then
     fi
 fi
 
-# Now finally run the backup into the WIP directory
-echo Running backup...
+# Now set up the Flags to use for the backup
 
-if [ "$COMPRESS_DATA_DURING_TRANSFER" = "true" ]; then
-    readonly EXTRA_ARG="--compress"
-else
-    readonly EXTRA_ARG=""
-fi
-
-result=0
-rsync -hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args $EXTRA_ARG $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS || result=$?
-# Flags:
+# Default Flags:
 # h - human readable sizes (KB, MG, GB), rather than everything in bytes.
 # u - update
 # a - Archive, implying:
@@ -99,6 +97,24 @@ rsync -hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing
 # --delete - delete files that are missing from the destination on update
 # --force  - delete non-empty directories, if they are missing from destination on update
 # --info=progress2 - display the new overall progress indicator
+# --ignore-missing-args - do not fail on files that have vanished between the file list being created and the copy operation
+# --delete-excluded - remove any thing that has previously been copied to the destination that now matches the excluded list
+FLAGS="-hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args --delete-excluded"
+
+# Optionally enable compression during transport
+if [ "$COMPRESS_DATA_DURING_TRANSFER" = "true" ]; then
+    FLAGS+=" --compress"
+fi
+
+# Add the exclusions (if any)
+for EXCLUDED_ITEM in "${EXCLUSION_LIST[@]}"; do
+    FLAGS+=" --exclude=\"${EXCLUDED_ITEM}\""
+done
+
+# Now finally run the backup into the WIP directory
+echo Running backup...
+result=0
+rsync $FLAGS $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS || result=$?
 
 # Ignore the vanished file error, but fail with error on any other error
 if [ $result != 0 ] && [ $result != $RSYNC_VANISHED_FILE_EXIT ]; then
