@@ -17,6 +17,7 @@ readonly MAX_BACKUPS=3
 readonly BACKUP_PREFIX="backup/"$USER"/"
 
 readonly FOLDER_TO_BACKUP=$HOME
+readonly COMPRESS_DATA_DURING_TRANSFER="false"
 
 # Constants - change them and it's your responsibility to ensure nothing breaks :) 
 readonly BACKUP_IN_PROGRESS="$BACKUP_PREFIX""WIP"
@@ -75,8 +76,14 @@ fi
 # Now finally run the backup into the WIP directory
 echo Running backup...
 
+if [ "$COMPRESS_DATA_DURING_TRANSFER" = "true" ]; then
+    readonly EXTRA_ARG="--compress"
+else
+    readonly EXTRA_ARG=""
+fi
+
 result=0
-rsync -hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS || result=$?
+rsync -hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args $EXTRA_ARG $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS || result=$?
 # Flags:
 # h - human readable sizes (KB, MG, GB), rather than everything in bytes.
 # u - update

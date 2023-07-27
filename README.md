@@ -17,8 +17,6 @@ If the backup is interrupted (unexpected reset, crash or whatever) it will resum
 
 The backups are uncompressed copies, so there is no 'restore' option - if you want to get a file back that you've lost, just get it from the backup folder.
 
-If you are backing up to a NAS, it may be worth investigating adding the z flag to the rsync call.
-
 ## Configuration
 ### MAX_BACKUPS
 You can configure the number of backups you want to maintain. If you specify 4 and you run the backup once per week, you will have 1 month of backups (but it will require 4 times the size of one backup).
@@ -30,6 +28,10 @@ If you do include $USER, then each user will have MAX_BACKUPS seperately.
 
 ### FOLDER_TO_BACKUP
 You can specify the folder to backup. By default, the $USERs home directory.
+
+### COMPRESS_DATA_DURING_TRANSFER
+If you are backing up over a network, e.g. to a NAS, enabling compression during the transfer will speed things up as the network traffic will be reduced.
+Do not enable for local backups (e.g. to an external drive) as this will pointlessly compress then copy then decompress, hence slower and with higher CPU usage.
 
 ## How to use it
 ### Quickstart
