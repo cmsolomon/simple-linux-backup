@@ -20,7 +20,7 @@ readonly COMPRESS_DATA_DURING_TRANSFER="false"
 readonly FOLDER_TO_BACKUP=$HOME
 
 # Add patterns for files or folders to exclude to this list, e.g.
-# readonly EXCLUSION_LIST=(
+# EXCLUSION_LIST=(
 #     "$FOLDER_TO_BACKUP/folder_to_exclude/"
 #     "$FOLDER_TO_BACKUP/file_to_exclude"
 #)
