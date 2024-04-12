@@ -82,6 +82,9 @@ fi
 
 # Now set up the Flags to use for the backup
 
+# Initialize FLAGS as an array
+FLAGS=()
+
 # Default Flags:
 # h - human readable sizes (KB, MG, GB), rather than everything in bytes.
 # u - update
@@ -98,23 +101,33 @@ fi
 # --force  - delete non-empty directories, if they are missing from destination on update
 # --info=progress2 - display the new overall progress indicator
 # --ignore-missing-args - do not fail on files that have vanished between the file list being created and the copy operation
+# --omit-dir-times - don't try to set the time on directories - this causes noisy warnings on FUSE mounts
 # --delete-excluded - remove any thing that has previously been copied to the destination that now matches the excluded list
-FLAGS="-hua --no-inc-recursive --delete --force --info=progress2 --ignore-missing-args --delete-excluded"
+
+# Add the flags individually
+FLAGS+=( -hua )
+FLAGS+=( --no-inc-recursive )
+FLAGS+=( --delete )
+FLAGS+=( --force )
+FLAGS+=( --info=progress2 )
+FLAGS+=( --ignore-missing-args )
+FLAGS+=( --omit-dir-times )
+FLAGS+=( --delete-excluded )
 
 # Optionally enable compression during transport
 if [ "$COMPRESS_DATA_DURING_TRANSFER" = "true" ]; then
-    FLAGS+=" --compress"
+    FLAGS+=( --compress )
 fi
 
 # Add the exclusions (if any)
 for EXCLUDED_ITEM in "${EXCLUSION_LIST[@]}"; do
-    FLAGS+=" --exclude=\"${EXCLUDED_ITEM}\""
+    FLAGS+=( --exclude="$EXCLUDED_ITEM" )
 done
 
 # Now finally run the backup into the WIP directory
 echo Running backup...
 result=0
-rsync $FLAGS $FOLDER_TO_BACKUP/ $BACKUP_IN_PROGRESS || result=$?
+rsync "${FLAGS[@]}" "$FOLDER_TO_BACKUP/" "$BACKUP_IN_PROGRESS" || result=$?
 
 # Ignore the vanished file error, but fail with error on any other error
 if [ $result != 0 ] && [ $result != $RSYNC_VANISHED_FILE_EXIT ]; then
