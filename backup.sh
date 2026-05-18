@@ -21,9 +21,10 @@ readonly FOLDER_TO_BACKUP=$HOME
 
 # Add patterns for files or folders to exclude to this list, e.g.
 # readonly EXCLUSION_LIST=(
-#     "$FOLDER_TO_BACKUP/folder_to_exclude/"
-#     "$FOLDER_TO_BACKUP/file_to_exclude"
+#     "folder_to_exclude/"
+#     "file_to_exclude"
 #)
+# Note, relative to FOLDER_TO_BACKUP, not the full path
 readonly EXCLUSION_LIST=()
 
 # Constants - change them and it's your responsibility to ensure nothing breaks :) 
